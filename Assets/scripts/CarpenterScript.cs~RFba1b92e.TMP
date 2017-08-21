@@ -1,0 +1,150 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class CarpenterScript : MonoBehaviour {
+
+    public GameObject selectCircle;
+    public Camera playerCamera;
+    public Text selectionTitle;
+    public GameObject gotoObject;
+
+    private ArrayList towerPositionArray = new ArrayList();
+    private ArrayList towerObjectArray = new ArrayList();
+    private GameObject triggerTowerObject;
+    private Quaternion lookPosition;
+    private bool selected = false;
+    private bool moving = false;
+    private CharacterController controller;
+    private Vector3 moveVector;
+    private float moveSpeed = 10;
+    private bool movingToTower = false;
+
+
+    // Use this for initialization
+    void Start () {
+        controller = GetComponent<CharacterController>();
+        Physics.IgnoreLayerCollision(8, 2);
+    }
+	
+	// Update is called once per frame
+	void Update () {
+
+        if (Vector3.Distance(transform.position, gotoObject.transform.position) < 2.2)
+        {
+            if (movingToTower)
+            {
+                if (towerObjectArray.Count > 0 && (GameObject)towerObjectArray[0] == triggerTowerObject.gameObject)
+                {
+                    if (towerPositionArray.Count == 1)
+                    {
+                        removeTowerFromArrays();
+                        gotoObject.transform.position = new Vector3(0, 0, 0);
+                        movingToTower = false;
+                        moving = false;
+                    }
+                    else if (towerPositionArray.Count > 1)
+                    {
+                        removeTowerFromArrays();
+
+                    }
+                }
+            }
+            else
+            {
+                moving = false;
+            }
+        }
+        else
+        {
+            //moving = false; Doesn't move, if distance greater then equals false
+        }
+
+
+        if (movingToTower)
+        {
+            moving = true;
+            if (towerPositionArray.Count >= 1 && towerObjectArray.Count == towerPositionArray.Count)
+            {
+                gotoObject.transform.position = (Vector3)towerPositionArray[0];
+            }
+            
+        }
+
+        if (moving)
+        {
+            lookPosition = Quaternion.LookRotation(new Vector3(gotoObject.transform.position.x, transform.position.y, gotoObject.transform.position.z) - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookPosition, Time.deltaTime * 10);
+            controller.Move(transform.forward * Time.deltaTime * moveSpeed);
+            selectCircle.transform.position = new Vector3(transform.position.x, transform.position.y - 2, transform.position.z);
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Physics.Raycast(ray, out hit);
+
+            if (hit.collider.gameObject.name == "Carpenter")
+            {
+                ClickedOn();
+            }
+            else if(hit.collider.gameObject.name == "Carpenter" && selected)
+            {
+                ClickedOff();
+            }
+        }
+
+        if (Input.GetMouseButtonDown(1) && selected)
+        {
+            
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Physics.Raycast(ray, out hit);
+            gotoObject.transform.position = (hit.point);
+            moving = true;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        triggerTowerObject = other.gameObject;
+    }
+
+    /// <summary>/////////////////////////////////////////////////////////////////////////////////////////////
+    /// Methods
+    /// </summary>////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    void ClickedOn()
+    {
+        //Instantiate(selectCircle, transform.position, Quaternion.AngleAxis(270, Vector3.left));
+        selectCircle.transform.position = new Vector3(transform.position.x, transform.position.y - 2, transform.position.z);
+        selectCircle.transform.localScale = new Vector3(2, 2, 1);
+        selectionTitle.text = "Carpenter";
+        selected = true;
+    }
+
+    void ClickedOff()
+    {
+        selected = false;
+        //selectCircle.transform.position = new Vector3(transform.position.x, transform.position.y - 10, transform.position.z);
+
+    }
+
+    public void addTowerToArrays(Vector3 newPosition, GameObject newObject) {
+        towerPositionArray.Add(newPosition);
+        towerPositionArray.Add(newObject);
+        if (!movingToTower)
+        {
+            movingToTower = true;
+        }
+    }
+
+    public void removeTowerFromArrays()
+    {
+        towerPositionArray.RemoveAt(0);
+        towerObjectArray.RemoveAt(0);
+    }
+}
