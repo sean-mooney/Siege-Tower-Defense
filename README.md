@@ -1,0 +1,6 @@
+# Siege-Tower-Defense
+<b><i>My attempt at recreating the classic Warcraft 3 mod "Line Tower Wars". Features a minimap, multiplayer capability, and object pathfinding. Made using Unity 3D, C#, Javascript, Blender, and Photoshop</i></b>
+
+You start the game by one player hosting a game and another client joining that session. From there, players can either choose to build towers with their Carpenter or rush to attack their opponent with creeps that they can spawn from the Mercenary Hut. Building and spawning creeps both cost money, which players gain on an income basis after a period of time. Players can increase their income each time by spawning more creeps, the more expensive the creep the higher your income will increase (Sheep += 1 income, Titan += 1000). The higher income will allow you to spawn more expensive creeps more frequently, as well as build stronger towers to defeat the creeps. Creeps and towers can be upgraded to be stronger and more durable so they have a better chance of making it through or killing the creeps.
+
+Each player has 30 lives. Creeps will continuously move down their opponents area until they reach the end at which point they will spawn in the next opponents area and continue their journey, or spawn at the top again and repeat the course. Last player standing is the winner.
